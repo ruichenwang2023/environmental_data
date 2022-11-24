@@ -1,0 +1,3 @@
+"0","hist(dat_habitat$aspect, breaks = 15,"
+"0","     main = ""Histogarm of aspect"","
+"0","     xlab = ""aspect"")"

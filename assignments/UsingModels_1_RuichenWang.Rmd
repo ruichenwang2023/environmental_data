@@ -1,0 +1,138 @@
+---
+title: "Using Models 1"
+author: "Ruichen Wang"
+date: "2022-11-13"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Answers in Tabs {.tabset}
+
+## Load data
+```{r echo = FALSE}
+require(here)
+catrate = read.csv(here("data","catrate.csv"))
+
+head(catrate)
+summary(catrate)
+
+```
+
+
+## Q1
+**Q1.**
+```{r histogram of the salamander reproduction catastrophic rates.}
+hist(catrate$cat.rate, main = "Histogram of Catastrophe Rates", xlab = "Catastrophe Rate", ylab = "Frequency")
+
+```
+
+
+## Q2-4
+**Q2.** p-value = 0.04097
+```{r Check for Normality}
+shapiro.test(catrate$cat.rate)
+
+```
+**Q3.** The null hypothesis for the Shapiro-Wilk test is: “The data were sampled from a normally-distributed population”.
+
+**Q4.** The p-value is less than 0.05, thus the null hypothesis is rejected. The sample care from a non-normally-distributed population. 
+
+**Other Normality Tests**
+```{r}
+require("nortest")
+ad.test(catrate$cat.rate)
+lillie.test(catrate$cat.rate)
+```
+
+
+## Q5-7
+**Q5.** 
+```{r two tailed Student t test}
+t.test(catrate$cat.rate, mu = 2/7)
+
+```
+**Q6.** The null hypothesis is: “The mean catastrophe rate we observed is equal to 2/7, the observed late-filling rate”.
+
+**Q7.** This is a two tailed t test.
+
+## Q8-10
+**Q8.** p-value = 0.01193. There is about 1% probability that the actual mean catastrophe rate equals to 2/7 but we conclude it is not. 
+
+**Q9.** 95% confidence interval is from 0.3526250 to 0.7261295, it did not include zero.
+
+**Q10.** Since we had a small p-value (<0.05) and that the confidence interval did not include zero, we conclude that there was strong evidence to reject the null hypothesis. 
+
+
+```{r one-sided studnet t test}
+# One-sided Alternative Hypothesis
+t.test(catrate$cat.rate, mu = 2/7, alternative = "greater")
+
+```
+
+
+## Q11-13
+**Q11.**
+```{r The Wilcoxon Rank Sum Test}
+wilcox.test(catrate$cat.rate, mu = 2/7)
+```
+**Q12.** Wilcoxon test p-value = 0.006275; Student's t test p-value = 0.01193
+     Wilcoxon test's p-value is smaller than studetn's t-test.
+     
+**Q13.** There was strong evidence to reject the null hypothesis, because the p-value 0.006275 was much smaller than 0.05. 
+
+## Q14-15
+**Q14.** The conclusions are the same that there was strong evidence to reject the null hypothesis that the mean is the same as expected value 2/7.
+
+**Q15.** I think Wilcoxon Rank Sum Test was more appropriate for these data because the data is from a small sample (13 observations) and not normally distributed
+
+
+## Penguin Data Exploration
+```{r Comparing two sample means, echo = FALSE}
+require(palmerpenguins)
+penguin_dat = droplevels(subset(penguins, species != "Gentoo"))
+
+#step 1: Numerical/Graphical Exploration
+summary(penguin_dat)
+boxplot(
+  flipper_length_mm ~ species,
+  data = penguin_dat,
+  ylab = "Flipper Length (mm)"
+)
+
+```
+
+## Q16-17
+**Q16**
+
+```{r Step 2 Normality test}
+dat_adelie = subset(penguin_dat, species =="Adelie") # Extract the Adelie penguin data
+shapiro.test(dat_adelie$flipper_length_mm) # test normality for flipper length
+
+dat_chinstrap = subset(penguin_dat, species == "Chinstrap")
+shapiro.test(dat_chinstrap$flipper_length_mm)
+
+
+```
+**Q17.** The p-values are both larger than 0.05, one is 0.72 and the other is 0.8106, so we could not reject that the two distribution are normal. 
+
+## Q18
+**Q18**
+
+```{r }
+par(mfrow = c(1,2))
+hist(dat_adelie$flipper_length_mm,main = "Adelie", xlab = "Flipper Length (mm)")
+hist(dat_chinstrap$flipper_length_mm, main = "Chinstrap", xlab = "Flipper Length (mm)")
+```
+
+
+## Q19-20
+**Q19.** Alternative hypothesis: the Adelie penguins' flipper lengths are different from Chinstrap penguins'. This is a two tailed test.
+
+**Q20.**
+```{r conducting 2 sample t test}
+t.test(flipper_length_mm ~ species, data = penguin_dat)
+```
+

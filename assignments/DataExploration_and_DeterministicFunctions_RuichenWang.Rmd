@@ -1,0 +1,96 @@
+---
+title: "Data Exploratin and Deterministic Functions Assignment"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cerulean
+  
+author: "Ruichen Wang"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r here packages install, echo = FALSE}
+require(here)
+```
+```{r load the data, echo = FALSE}
+dat_habitat = data.frame(read.csv(here("data","hab.sta.csv")))
+```
+
+
+### Terrain Histograms
+
+```{r terrain histograms, echo = FALSE, fig.height = 10}
+par(mfrow = c(3 , 1))
+hist(dat_habitat$elev, breaks = 10,
+     main = "Histogram of elevation",
+     xlab = "elevation")
+hist(dat_habitat$slope, breaks = 10,
+     main = "Histogram of slope",
+     xlab = "slope")
+hist(dat_habitat$aspect, breaks = 15,
+     main = "Histogarm of aspect",
+     xlab = "aspect")
+```
+
+```{r visual estimation of linear model, echo = FALSE}
+
+# Calculates the value of y for a linear function, given the coordinates
+# of a known point (x1, y1) and the slope of the line.
+line_point_slope = function(x, x1, y1, slope)
+{
+  get_y_intercept = 
+    function(x1, y1, slope) 
+      return(-(x1 * slope) + y1)
+  
+  linear = 
+    function(x, yint, slope) 
+      return(yint + x * slope)
+  
+  return(linear(x, get_y_intercept(x1, y1, slope), slope))
+}
+
+```
+
+### Scatterplots
+
+```{r scatterplots, echo = FALSE, fig.height = 10}
+par(mfrow = c(3, 1))
+plot(x = dat_habitat$elev, y = dat_habitat$ba.tot, 
+     xlab = "elevation", ylab = "Total Basal Area",
+     main = "Basal area and elevation", col = "blue", cex = 0.6)
+curve(line_point_slope(x, x1 = 475, y1 = 20, slope = -0.01), add = TRUE, col = "green")
+
+plot(x = dat_habitat$slope, y = dat_habitat$ba.tot,
+     xlab = "slopt", ylab = "Total Basal Area",
+     main = "Basal area and slope", col = "red", cex = 0.6)
+curve(line_point_slope(x, x1 = 50, y1 = 30, slope = 0.05), add = TRUE, col = "green")
+
+plot(x = dat_habitat$aspect, y = dat_habitat$ba.tot,
+     xlab = "aspect", ylab = "Total Basal Area",
+     main = "Basal area and aspect", col = "orange", cex = 0.6)
+curve(line_point_slope(x, x1 = 175, y1 = 30, slope = 0.02), add = TRUE, col = "green")
+
+
+```
+
+
+### Assignment Questions
+1. Figures see above
+
+2. The distribution of elevation at the bird census sample sites is a shape of normal distribution. There are more sampling sites from 200-500 m, which is approximately in the middle of the range. Neither high- nor low-elevation has a high frequency. 
+
+3. The slope is described as percent slope, ranging from 0 - 110, and is unitless. 
+
+4. The distribution of the slope at the bird census sample sites is a shape of normal distribution. There are more sampling sites from 40-60% slope, which is approximately in the middle of the range. Neither too flat nor too steep of a slope has a high frequency. 
+
+5. Aspect is the direction that a slope faces. The unit of aspect in this data set is degree, ranging from 0 to 360 degrees. 
+
+6. The distribution of the aspect at the bird census sample sites is evenly distributed. The frequency of the aspects is about the same, and neither north-facing nor south-facing aspect is dominating. 
+
+7. Figures see above
+
+8. There is not a noticeable association. My linear model seems not fit the data very well because there is not a visually clear trend.

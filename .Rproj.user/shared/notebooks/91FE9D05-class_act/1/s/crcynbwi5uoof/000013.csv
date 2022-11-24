@@ -1,0 +1,1 @@
+"0","boxplot(ginkgo.dat$petiole_length ~ ginkgo.dat$seeds_present)"

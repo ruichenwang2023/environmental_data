@@ -1,0 +1,4 @@
+"0","par(mfrow = c(3, 1))"
+"0","plot(x = dat_habitat$elev, y = dat_habitat$ba.tot, "
+"0","     xlab = ""elevation"", ylab = ""Total Basal Area"","
+"0","     main = ""Basal area and elevation"", col = ""blue"", cex = 0.8)"

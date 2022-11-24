@@ -1,0 +1,60 @@
+---
+title: "Probability and Frequentist Concepts"
+author: "Ruichen Wang"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+1. Probability of observing a count of exactly 3 successes in a binomial distribution with parameters n = 4 and p = 0.75
+```{r}
+dbinom(3,size = 4, prob = 0.75)
+```
+
+2. Probability of observing a count of 3 successes or fewer
+```{r}
+pbinom(3, size = 4, prob = 0.75)
+```
+or
+```{r}
+1 - dbinom(4, size = 4, prob = 0.75)
+```
+
+3. Probability of observing more than 3 successes in a binomial distribution with parameters n = 5 and p = 0.75
+```{r}
+1 - pbinom(3, size = 5, prob = 0.75)
+```
+
+4. Probability of observing a value of less than 1.2 from a normally-distributed population with mean = 2 and standard deviation = 2
+```{r}
+pnorm(1.2, mean = 2, sd = 2)
+```
+
+5. Probability of observing a value of greater than 1.2
+```{r}
+1 - pnorm(1.2, mean = 2, sd = 2)
+```
+
+6. Probability of observing a value between 1.2 and 3.2
+```{r}
+pnorm(3.2, mean = 2, sd = 2) - pnorm(1.2, mean = 2, sd = 2)
+```
+
+7. The shape of of histogram is approaching a skewed distribution to the left.
+
+8. The shape of of histogram is approaching a normal distribution.
+
+9. The shape of of histogram is approaching a normal distribution. The shape is narrower than the distribution in Q8.
+
+10. Because for sample size of 1 the mean is the draw itself, whereas for sample size of 2 the mean lies between of the 2 draws, so there is a larger probability that the mean is normally distributed. 
+
+11. The two main factors that determine the width of the sampling distribution of the mean are sample size and population standard deviation.
+
+12. 
+```{r}
+25 * 25 * 25
+```
+
+13. 25B

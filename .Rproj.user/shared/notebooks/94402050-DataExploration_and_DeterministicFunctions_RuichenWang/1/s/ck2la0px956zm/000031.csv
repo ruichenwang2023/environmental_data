@@ -1,0 +1,4 @@
+"0",""
+"0","plot(x = dat_habitat$aspect, y = dat_habitat$ba.tot,"
+"0","     xlab = ""aspect"", ylab = ""Total Basal Area"","
+"0","     main = ""Basal area and aspect"", col = ""orange"")"

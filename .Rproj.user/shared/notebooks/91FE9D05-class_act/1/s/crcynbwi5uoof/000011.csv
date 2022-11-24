@@ -1,0 +1,1 @@
+"0","plot(x = ginkgo.dat$seeds_present, y = ginkgo.dat$petiole_length)"

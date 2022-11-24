@@ -1,0 +1,8 @@
+"0","require(here())"
+"2","Loading required package: here
+"
+"2","here() starts at D:/UMass/Academic/Fall 2022/ECo 602/environmental_data
+"
+"0","bird = read.csv(here(""data"",""bird.sta.csv""))"
+"0","habitat = read.csv(here(""data"", ""hab.sta.csv""))"
+"0","dat_all = merge(bird, habitat)"

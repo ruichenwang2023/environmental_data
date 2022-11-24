@@ -1,0 +1,7 @@
+"0","require(""here"")"
+"2","Loading required package: here
+"
+"2","here() starts at D:/UMass/Academic/Fall 2022/ECo 602/environmental_data
+"
+"0","ginkgo.dat = read.csv(here(""data"", ""ginkgo_data_2022.csv""))"
+"0","ginkgo.dat"

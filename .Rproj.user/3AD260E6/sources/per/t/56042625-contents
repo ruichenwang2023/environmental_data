@@ -1,0 +1,235 @@
+---
+title: "Class activity"
+author: "Ruichen Wang"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+the probability of observing birds in exactly four of the six patches. earlier observations 2/3 present
+```{r}
+dbinom(4,size = 6, prob = 0.6777)
+```
+```{r}
+pbinom(4, 6, 2/3, lower.tail = TRUE, log.p = FALSE)
+```
+```{r}
+1 - pbinom(3, 6, 2/3, lower.tail = TRUE, log.p = FALSE)
+```
+
+```{r}
+# Standard normal has mean = 0 and sd = 1
+dnorm(0.5, mean = 0, sd = 1)
+dnorm(1, mean = 0, sd = 1)
+```
+```{r}
+pnorm(0.5, mean = 0, sd = 1)
+```
+
+```{r}
+less_1 = pnorm(1, mean = 0, sd = 1)
+less_2 = pnorm(2, mean = 0, sd = 1)
+less_2 - less_1
+```
+
+```{r}
+# How many points?
+n = 1000
+
+# Create a vector of x-values from -4 to 4:
+x = seq(from = -4, to = 4, length.out = n)
+
+# Create the corresponding y-values:
+y = dnorm(x, mean = 0, sd = 1)
+y_2 = dnorm(x, mean = 0, sd = 2)
+
+# plot!
+plot(y ~ x, type = "l")
+points(y_2 ~ x, type = "l", lty = 2)
+```
+
+
+
+
+```{r}
+qnorm(c(0.05, 0.95))
+qt(p = c(0.025, 0.975), df = 10)
+```
+?qt()
+```{r}
+for (i in 1:1000){
+  if (round(qt(p = 0.025, df = i),1) == -2.0){
+    print(i)
+    break}}
+```
+
+```{r}
+for (i in 1:1000){
+  if (round(qt(p = 0.025, df = i),2) == -1.96){
+    print(i)
+    break}}
+
+```
+
+# W8 In-class likelihoods
+```{r}
+require(here())
+bird = read.csv(here("data","bird.sta.csv"))
+habitat = read.csv(here("data", "hab.sta.csv"))
+dat_all = merge(bird, habitat)
+```
+
+```{r}
+x_observed = c(2, 6)
+print(x_observed)
+```
+```{r}
+dpois(x = 2, lambda = 4.5)
+dpois(x = 6, lambda = 4.5)
+
+#the likelihood of observing those particular counts together
+dpois(x = 2, lambda = 4.5) * dpois(x = 6, lambda = 4.5)
+
+#advantage of vectorization in R
+wiwa_counts = c(2,6)
+dpois(x = wiwa_counts, lambda = 4.5)
+prod(dpois(x = wiwa_counts, lambda = 4.5))
+
+#sum of log-likelihoods
+sum(log(dpois(x = wiwa_counts, lambda = 4.5)))
+```
+```{r}
+summary(dat_all$WIWA)
+```
+
+```{r}
+hist(dat_all$WIWA, breaks = 7)
+hist(dat_all$WIWA, breaks = 0:7)
+0:7 - 0.5
+hist(dat_all$WIWA, breaks = 0:7 - 0.5)
+
+
+```
+
+```{r}
+par(mfrow = c(1, 2))
+dat = dat_all$WIWA
+hist(dat, breaks = 0:(max(dat) + 1) - 0.5, main = "Histogram of\nWilson's Warbler counts")
+
+dat = dat_all$GRJA
+hist(dat, breaks = 0:(max(dat) + 1) - 0.5, main = "Histogram of\nGray Jay counts")
+```
+
+
+```{r}
+sum(log(dpois(x = wiwa_counts, lambda = 4.0)))
+```
+```{r}
+WIWR = dat_all$WIWR
+summary(WIWR)
+hist(WIWR, breaks = 0:(max(WIWR) + 1) - 0.5, main = "Histogram of\nWilson's Wrens counts")
+```
+```{r}
+sum(log(dpois(x = bird$WIWR, lambda = 1.5)))
+```
+
+you wanted to use a binomial distribution instead of a Poisson distribution.
+Find values of the parameters for a binomial distribution that make the vector of census counts most likely.
+```{r}
+sum(log(dbinom(WIWR, size = 7, prob = 0.21)))
+
+max(WIWR)
+mean(WIWR)
+```
+
+```{r}
+set.seed(1)
+vec_rnorm = rnorm(n = 10, mean = 0, sd = 1)
+log(dnorm(vec_rnorm, mean = 0, sd = 1))
+sum(log(dnorm(vec_rnorm, mean = 0, sd = 1)))
+sum(log(dnorm(vec_rnorm, mean = 0.13, sd = 0.74))) # guess and check
+```
+
+```{r}
+require(palmerpenguins)
+head(penguins)
+```
+
+```{r}
+dat_ade = droplevels(subset(penguins, species == "Adelie"))
+hist(dat_ade$body_mass_g, main = "Adelie Penguins: Body Mass", xlab = "body mass (g)")
+boxplot(dat_ade$body_mass_g ~ dat_ade$sex)
+```
+```{r}
+#female Adelie penguins have a body mass different from zero grams
+dat_ade_f = droplevels(subset(dat_ade, sex == "female"))
+t.test(dat_ade_f$body_mass_g,mu = 0)
+```
+```{r}
+#male Adelie penguins have a mean body mass greater than 4000 grams
+dat_ade_m = droplevels(subset(dat_ade, sex == "male"))
+t.test(dat_ade_m$body_mass_g, mu = 4000, alternative = "greater")
+```
+
+```{r}
+#two-sample t-test of the alternative hypothesis that male and female Adelie penguins have different mean body masses. Show your r-code.
+t.test(x = dat_ade_m$body_mass_g, y = dat_ade_f$body_mass_g)
+```
+
+```{r}
+#two-sample (one-tailed) t-test of the directional alternative hypothesis that male Adelie penguins are heavier than females.
+t.test(x = dat_ade_m$body_mass_g, y = dat_ade_f$body_mass_g, alternative = "greater")
+```
+
+```{r}
+#directional alternative hypothesis that male Adelie penguins are lighter than females
+t.test(x = dat_ade_m$body_mass_g, y = dat_ade_f$body_mass_g, alternative = "l")
+```
+
+Model coefficient
+```{r}
+data(iris)
+
+fit_species = 
+  lm(
+    Sepal.Length ~ Species, data = iris
+  )
+
+plot(
+  Sepal.Length ~ Species, data = iris,
+  xlab = "Species", ylab = "Sepal Length (cm)"
+)
+summary(fit_species)
+shapiro.test(residuals(fit_species))
+
+```
+
+```{r}
+plot(
+  Petal.Width ~ Petal.Length, data = iris, xlab = "Petal Len", ylab = "Petal Wid"
+)
+
+fit_petals = 
+  lm(
+    Petal.Width ~ Petal.Length, data = iris
+  )
+summary(fit_petals)
+shapiro.test(residuals(fit_petals))
+```
+# **Ginko**
+```{r Ginko}
+require("here")
+ginkgo.dat = read.csv(here("data", "ginkgo_data_2022.csv"))
+ginkgo.dat
+```
+```{r}
+ginkgo_seed = subset(ginkgo.dat, seeds_present == "TRUE", select = c("site_id", "seeds_present"))
+ginkgo_seed
+```
+```{r}
+plot(x = ginkgo.dat$seeds_present, y = ginkgo.dat$petiole_length)
+boxplot(ginkgo.dat$petiole_length ~ ginkgo.dat$seeds_present)
+```
+

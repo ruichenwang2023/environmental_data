@@ -1,0 +1,3 @@
+"0","hist(dat_habitat$slope, breaks = 10,"
+"0","     main = ""Histogram of slope"","
+"0","     xlab = ""slope"")"

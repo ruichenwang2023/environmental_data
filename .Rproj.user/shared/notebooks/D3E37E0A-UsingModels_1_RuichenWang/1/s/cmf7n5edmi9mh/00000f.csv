@@ -1,0 +1,2 @@
+"0","hist(catrate$cat.rate, main = ""Histogram of Catastrophe Rates"", xlab = ""Catastrophe Rate"", ylab = ""Frequency"")"
+"0",""

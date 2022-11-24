@@ -1,0 +1,2 @@
+"0","ginkgo_seed = subset(ginkgo.dat, seeds_present == ""TRUE"", select = c(""site_id"", ""seeds_present""))"
+"0","ginkgo_seed"

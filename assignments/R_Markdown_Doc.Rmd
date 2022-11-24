@@ -1,0 +1,25 @@
+---
+title: "R Markdown Dovuments - Part 1"
+subtitle: "Analysis of Environmental Data"
+author: "Ruichen Wang"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cerulean
+---
+
+
+# Introduction
+
+Hi! My name is **Ruichen Wang**. I am a senior student in *Environmental Science* major. I like ecology and GIS. I think R is a great tool to study ecological studies!
+
+# Concept List
+1. Basic R
+1. Hypothesis testing
+1. Bayesian statistics
+
+# Course List
+* Analysis of Environmental Data
+* Introduction to GIS
+* Python for GIS
