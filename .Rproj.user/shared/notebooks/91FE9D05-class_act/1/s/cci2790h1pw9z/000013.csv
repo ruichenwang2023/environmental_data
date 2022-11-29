@@ -1,3 +1,0 @@
-"0","plot("
-"0","  Petal.Width ~ Petal.Length, data = iris, xlab = ""Petal Len"", ylab = ""Petal Wid"""
-"0",")"
