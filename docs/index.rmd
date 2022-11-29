@@ -9,4 +9,4 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Welcome to Ruichen's class page!!
+Welcome to Ruichen's class page!!!
