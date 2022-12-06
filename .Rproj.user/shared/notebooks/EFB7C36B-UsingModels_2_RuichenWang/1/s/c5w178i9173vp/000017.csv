@@ -1,0 +1,3 @@
+"0","#explore normality using histograms and density plots"
+"0","par(mfrow = c(1, 2))"
+"0","hist(penguins$body_mass_g, breaks = 80, main = ""histogram of body mass"", xlab = ""body mass (g)"")"

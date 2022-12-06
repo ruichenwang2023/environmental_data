@@ -1,0 +1,135 @@
+---
+title: "Using Models 2"
+author: "Ruichen Wang"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# {.tabset}
+
+## Walk through
+**Recap: 1 and 2 sample t-test**
+```{r}
+#whether Gentoo penguin flipper lengths are equal to 0 mm
+require(palmerpenguins)
+t.test(subset(penguins, species == "Gentoo")$flipper_length_mm)
+```
+```{r}
+#whether Gentoo penguin flipper lengths are equal to 218 mm
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218
+)
+```
+```{r}
+#whether Gentoo penguin flipper lengths are smaller than 218 mm
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218,
+  alternative = "less"
+)
+```
+```{r}
+# 2-sample t-test
+t.test(flipper_length_mm ~ species, data = subset(penguins, species != "Chinstrap"))
+```
+```{r}
+#Adelie penguins have shorter than Gentoo penguins
+t.test(flipper_length_mm ~ species, data = subset(penguins, species != "Chinstrap"), alternative = "less")
+```
+
+
+**Graphical and Numerical exploration**
+```{r}
+#explore normality using histograms and density plots
+par(mfrow = c(1, 2))
+hist(penguins$body_mass_g, breaks = 80, main = "histogram of body mass", xlab = "body mass (g)")
+plot(density(penguins$body_mass_g, na.rm = TRUE), main = "density plot of body mass")
+```
+```{r}
+boxplot(body_mass_g ~ species, data = penguins)
+```
+
+```{r}
+dat_chinstrap = subset(penguins, species == "Chinstrap")
+mean(dat_chinstrap$body_mass_g, na.rm = TRUE)
+shapiro.test(dat_chinstrap$body_mass_g)
+```
+```{r}
+aggregate(body_mass_g ~ species, data = penguins, FUN = mean)
+```
+```{r}
+aggregate(
+  body_mass_g ~ species,
+  data = penguins,
+  FUN = function(x) shapiro.test(x)$p.value)
+```
+
+**1-way ANOVA walk through**
+```{r}
+fit_species = lm(body_mass_g ~ species, data = penguins)
+summary(fit_species)
+```
+```{r}
+anova(fit_species)
+```
+**fit a 2-way, additive model**
+```{r}
+
+fit_additive = lm(body_mass_g ~ sex + species, data = penguins)
+summary(fit_additive)
+
+```
+**2-way interactive (factorial) ANOVA**
+See Q4 - Q5
+
+**Simple Linear Regression:Penguin Bills and Body mass**
+```{r}
+lm(bill_length_mm ~ body_mass_g, data = penguins)
+```
+
+
+
+
+## Q1 - Q4
+
+**Q1.** 
+```{r}
+xlabel=c("female\nAdelie","male\nAdelie","female\nChinstrap","male\nChinstrap","female\nGentoo","male\nGentoo")
+boxplot(body_mass_g ~ sex + species, data = penguins,ylab = "Body Mass (g)",names = xlabel)
+
+```
+
+**Q2.** I think male penguins are significantly heavier than female penguins of the same species. Because the means of the male body mass is larger than the female body mass. The boxes of male body mass is always above the boxes of female body mass within species.
+
+**Q3.** Yes, I think adding sex will improve the model fit because sex is a important parameter that causes difference in body mass within species. 
+
+
+## Q4 - Q5
+**Q4.**
+```{r}
+fit_both = lm(body_mass_g ~ sex * species, data = penguins)#This line of code is the answer 
+
+summary(fit_both)
+
+```
+**Q5.** The base case is female Adelie.
+
+## Q6 - Q8
+**Q6.** Intercept and speciesChinStrap.
+
+**Q7.** 3372.39+26.92 = 3399.31
+```{r}
+fit_additive = lm(body_mass_g ~ sex + species, data = penguins)
+summary(fit_additive)
+```
+
+**Q8.** 3527.206	
+```{r}
+aggregate(body_mass_g ~ sex*species, data = penguins, FUN = mean)
+```
+

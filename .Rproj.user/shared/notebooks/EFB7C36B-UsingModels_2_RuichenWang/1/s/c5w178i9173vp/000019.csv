@@ -1,0 +1,1 @@
+"0","plot(density(penguins$body_mass_g, na.rm = TRUE), main = ""density plot of body mass"")"

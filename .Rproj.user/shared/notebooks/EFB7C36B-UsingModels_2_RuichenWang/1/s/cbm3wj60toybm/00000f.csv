@@ -1,0 +1,23 @@
+"0","lm(bill_length_mm ~ body_mass_g, data = penguins)
+"
+"1","
+Call:
+"
+"1",""
+"1","lm(formula = bill_length_mm ~ body_mass_g, data = penguins)"
+"1",""
+"1","
+
+"
+"1","Coefficients:
+"
+"1","(Intercept)  "
+"1","body_mass_g  "
+"1","
+"
+"1","  26.898872  "
+"1","   0.004051  "
+"1","
+"
+"1","
+"
