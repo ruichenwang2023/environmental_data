@@ -1,0 +1,9 @@
+"0","# load the here and palmerpenguins packages using library()"
+"0","library(here)"
+"2","here() starts at D:/UMass/Academic/Fall 2022/ECo 602/environmental_data
+"
+"0","library(palmerpenguins)"
+"0",""
+"0","# load the here and palmerpenguins packages using require()"
+"0","require(here)"
+"0","require(palmerpenguins)"
