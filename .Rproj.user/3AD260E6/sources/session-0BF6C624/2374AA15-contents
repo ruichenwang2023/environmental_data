@@ -1,5 +1,5 @@
 ---
-title: "Ruichen's Project Homepage"
+title: "Final Project: R Reference Guide"
 author: "Ruichen Wang"
 date: "`r Sys.Date()`"
 output: html_document
@@ -9,4 +9,7 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Welcome to Ruichen's class page!!!
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
