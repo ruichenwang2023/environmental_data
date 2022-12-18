@@ -11,8 +11,114 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Data Analysis {.tabset .tabset-pills}
 
+## Data Exploration
 
-## Loading Data and Packages
+``` {r echo = FALSE, results='hide'}
+require("here")
+delomys = read.csv(here("data","delomys.csv"))
+head(delomys)
+```
 
-## Q1 - Q4
 
+``` {r echo = FALSE, results='hide'}
+plot(delomys$body_mass, delomys$body_length)
+hist(delomys$body_mass)
+hist(delomys$body_length)
+boxplot(delomys$body_mass ~ delomys$binomial)
+boxplot(delomys$body_mass ~ delomys$sex)
+boxplot(delomys$body_mass ~ delomys$binomial + delomys$sex)
+```
+
+**Q1.** There is a linear relationship between body mass and length.
+
+**Q2.** Body mass seems normally distributed but body length did not. Normally distributed data benefits later probability calculation because the those calculations assume data is normally distributed. Also, normality of the residual is also important when we make a linear model.
+
+**Q3.** Even though the distribution of body mass seems normal, the p-values of the Shapiro test for both body mass and body length are less than 0.05 and the null hypotheses are rejected. It means that the data were not sampled from a normally distributed population.
+
+``` {r echo = FALSE}
+shapiro.test(delomys$body_mass)
+shapiro.test(delomys$body_length)
+```
+
+**Q4.** Based on the conditional boxplot, it seems the difference in body mass is larger based on species than based on sex. The means of the body mass were similar when separated by sex but different when separated by species.
+
+## Model Building
+
+``` {r echo = FALSE, results='hide'}
+fit1 = lm(delomys$body_length ~ delomys$body_mass)
+fit2 = lm(delomys$body_mass ~ delomys$sex)
+fit3 = lm(delomys$body_mass ~ delomys$binomial)
+fit4 = lm(body_mass ~ sex + binomial, data = delomys)
+fit5 = lm(body_mass ~ sex * binomial, data = delomys)
+```
+
+``` {r echo = FALSE}
+hist(residuals(fit1))
+hist(residuals(fit2))
+hist(residuals(fit3))
+hist(residuals(fit4))
+hist(residuals(fit5))
+```
+
+``` {r echo = FALSE}
+shapiro.test(residuals(fit1))
+shapiro.test(residuals(fit2))
+shapiro.test(residuals(fit3))
+shapiro.test(residuals(fit4))
+shapiro.test(residuals(fit5))
+```
+
+**Q5.** Even though from the histograms, the distribution of model 2 through model 5 residuals seems normal, the shapiro test returned very small p-value for all model residuals. This means that all of the normality test reject the hypothesis that the residuals are normally distributed.
+
+**Q6.** No. Violations of the normality assumptions are more severe for Group 1 models than other models.
+
+## Model Interpretation
+
+``` {r echo = FALSE}
+knitr::kable(coef(summary(fit1)),digit = 5)
+```
+
+**Q7.** The slope of the trend line of the mass/length relationship is 0.87550.
+
+**Q8.** The body length of an animal that weighs 100 g is 100 \* 0.87550 + 76.12466 = 163.6747 mm
+
+**Q9.** The body length of an animal that weighs 0g is 76.12 mm.
+
+``` {r echo = FALSE}
+knitr::kable(coef(summary(fit2)),digit = 5)
+knitr::kable(coef(summary(fit3)),digit = 5)
+knitr::kable(coef(summary(fit4)),digit = 5)
+knitr::kable(coef(summary(fit5)),digit = 5)
+```
+
+**Q10.** Female is the base level for sex.
+
+**Q11.** Delomys dorsalis is the base level for binomial.
+
+**Q12.** Male is heavier, because male has a 2.78 weight difference than females (base), meaning the average body mass of male is larger than of female.
+
+**Q13.**Delomys dorsalis is heavier, because sublineatus has a -7.68 of weight difference than dorsalis. The negative value means sublineatus is lighter than dorsalis.
+
+``` {r echo = FALSE}
+knitr::kable(anova(fit1), digit = 5)
+knitr::kable(anova(fit2), digit = 5)
+knitr::kable(anova(fit3), digit = 5)
+knitr::kable(anova(fit4), digit = 5)
+knitr::kable(anova(fit5), digit = 5)
+```
+
+**Q14.** Sex and species are significant predictors for body mass. From the ANOVA table we see the p-value for F test are both smaller than 0.05, meaning their effects on body mass are significant.
+
+**Q15.** There is not a significant interaction between sex and species. The p-value of sex and species interaction is 0.95, which is not significant. This means that the variation in body mass is not caused by the interaction. 
+
+**Q16.** The significance level of sex or species did not change very much among the different models. The p-values of F test for all models are significantly small, except for the interaction between sex and species. 
+
+## Model Comparison
+
+``` {r echo = FALSE}
+AIC(fit1,fit2,fit3,fit4,fit5)
+```
+
+**Q17.** Model 1 (body mass ~ body length) and model 4 (body mass ~ sex + species) had the lowest AIC. 
+
+**Q18.** I will choose model 1 and model 4 because I think they both have a low AICs, which means the data fit the model better than other model. They are also easy to understand. For model 1, it makes sense that body mass and body length have a correlation. For model 4, the result suggest that both sex and species cause the variation in body mass. 

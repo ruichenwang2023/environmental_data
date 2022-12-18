@@ -1,0 +1,419 @@
+---
+title: "Draft of CDR Career Plot Data for RW"
+author: "Alex Wu"
+date: '2022-08-08'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(AICcmodavg)
+library(ggplot2)
+library(psych)
+library(RColorBrewer)
+library(viridis)
+library(paletteer)
+library(tidyverse)
+```
+
+```{r}
+set.seed(7)
+```
+
+```{r}
+#Reading the data
+CDR <- read.csv("Microcosms with Run data_RW.xlsx - Cumulative Summary AW Edit.csv")
+```
+
+```{r}
+str(CDR)
+#Site, Fertilizer, and litter were read in as characters
+```
+
+```{r}
+#Changing into Factors
+CDR$Site <- as.factor(CDR$Site)
+CDR$Fertilizer.Treatment <- as.factor(CDR$Fertilizer.Treatment)
+CDR$Litter.type <- as.factor (CDR$Litter.type)
+```
+
+```{r}
+ggplot(CDR, aes(x= Fertilizer.Treatment, y= CO2.mg, group= Site, color= Site)) + geom_point()
+```
+
+```{r}
+pairs.panels(CDR)
+```
+
+```{r}
+hist(CDR$CO2.mg)
+```
+```{r}
+CDR$Fertilizer.Treatment <- relevel(CDR$Fertilizer.Treatment,ref = "W") #Releveling Fetilizer.Treatment so that our control W is referenced
+```
+
+```{r}
+m.null <- glm(CO2.mg ~ 1, data = CDR, family = "inverse.gaussian") #Null Model
+#Additive Alone
+m.1 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian") #Full Model
+m.2 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.3 <- glm(CO2.mg ~ Site + Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.4 <- glm(CO2.mg ~ Site + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.5 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.6 <- glm(CO2.mg ~ Fertilizer.Treatment + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.7 <- glm(CO2.mg ~ Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+#Interactive Alone
+m.8 <- glm(CO2.mg ~ Site * Fertilizer.Treatment * Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.9 <- glm(CO2.mg ~ Site * Fertilizer.Treatment + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.10 <- glm(CO2.mg ~ Fertilizer.Treatment * Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.11 <- glm(CO2.mg ~ Site * Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+# Full Model
+m.12 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+# 3 interactive + 2 additive 
+m.13 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.14 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.15 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+# 3 interactive + 1 additive
+m.16 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.17 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.18 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+# 2 interactive + 3 additive
+m.19 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.20 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.21 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+#1 interactive + 3 additive 
+m.22 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.23 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.24 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+
+#Interactive Alone
+m.25 <- glm(CO2.mg ~ Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.26 <- glm(CO2.mg ~ Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "inverse.gaussian")
+m.27 <- glm(CO2.mg ~ Site*Litter.type + Fertilizer.Treatment*Litter.type+ (1|Vial), data = CDR, family = "inverse.gaussian")
+
+#SITE
+m.28 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.29 <- glm(CO2.mg ~ Site + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.30 <- glm(CO2.mg ~ Site + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.31 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.32 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.33 <- glm(CO2.mg ~ Site + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#Fertilizer Treatment
+m.34 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.35 <- glm(CO2.mg ~ Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.36 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.37 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.38 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.39 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#Litter type
+m.40 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.41 <- glm(CO2.mg ~ Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.42 <- glm(CO2.mg ~ Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.43 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.44 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.45 <- glm(CO2.mg ~ Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#Site + Fertilizer
+m.46 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.47 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.48 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.49 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.50 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.51 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#Site + Litter type
+m.52 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.53 <- glm(CO2.mg ~ Site + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.54 <- glm(CO2.mg ~ Site + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.55 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.56 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.57 <- glm(CO2.mg ~ Site + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#Fertilizer + litter type
+m.58 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.59 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.60 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.61 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.62 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+m.63 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="inverse.gaussian")
+
+#gaussian
+G.m.null <- glm(CO2.mg ~ 1, data = CDR, family = "Gamma") #Null Model
+#Additive Alone
+G.m.1 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + (1|Vial), data = CDR, family = "Gamma") #Full Model
+G.m.2 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + (1|Vial), data = CDR, family = "Gamma")
+G.m.3 <- glm(CO2.mg ~ Site + Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.4 <- glm(CO2.mg ~ Site + (1|Vial), data = CDR, family = "Gamma")
+G.m.5 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.6 <- glm(CO2.mg ~ Fertilizer.Treatment + (1|Vial), data = CDR, family = "Gamma")
+G.m.7 <- glm(CO2.mg ~ Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+#Interactive Alone
+G.m.8 <- glm(CO2.mg ~ Site * Fertilizer.Treatment * Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.9 <- glm(CO2.mg ~ Site * Fertilizer.Treatment + (1|Vial), data = CDR, family = "Gamma")
+G.m.10 <- glm(CO2.mg ~ Fertilizer.Treatment * Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.11 <- glm(CO2.mg ~ Site * Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+# Full Model
+G.m.12 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+# 3 interactive + 2 additive 
+G.m.13 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.14 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.15 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+# 3 interactive + 1 additive
+G.m.16 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.17 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.18 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+# 2 interactive + 3 additive
+G.m.19 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.20 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.21 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+#1 interactive + 3 additive 
+G.m.22 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.23 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family = "Gamma")
+G.m.24 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+#Interactive Alone
+G.m.25 <- glm(CO2.mg ~ Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+G.m.26 <- glm(CO2.mg ~ Site*Fertilizer.Treatment + (1|Vial), data = CDR, family = "Gamma")
+G.m.27 <- glm(CO2.mg ~ Site*Litter.type + (1|Vial), data = CDR, family = "Gamma")
+
+#SITE
+G.m.28 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.29 <- glm(CO2.mg ~ Site + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.30 <- glm(CO2.mg ~ Site + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.31 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.32 <- glm(CO2.mg ~ Site + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.33 <- glm(CO2.mg ~ Site + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+
+#Fertilizer Treatment
+G.m.34 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.35 <- glm(CO2.mg ~ Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.36 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.37 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.38 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.39 <- glm(CO2.mg ~ Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+
+#Litter type
+G.m.40 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.41 <- glm(CO2.mg ~ Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.42 <- glm(CO2.mg ~ Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.43 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.44 <- glm(CO2.mg ~ Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.45 <- glm(CO2.mg ~ Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+
+#Site + Fertilizer
+G.m.46 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.47 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.48 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.49 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.50 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.51 <- glm(CO2.mg ~ Site + Fertilizer.Treatment + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+
+#Site + Litter type
+G.m.52 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.53 <- glm(CO2.mg ~ Site + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.54 <- glm(CO2.mg ~ Site + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.55 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.56 <- glm(CO2.mg ~ Site + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.57 <- glm(CO2.mg ~ Site + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+
+#Fertilizer + litter type
+G.m.58 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + (1|Vial), data = CDR, family ="Gamma")
+G.m.59 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.60 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.61 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Site*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.62 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Fertilizer.Treatment + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+G.m.63 <- glm(CO2.mg ~ Fertilizer.Treatment + Litter.type + Site*Litter.type + Fertilizer.Treatment*Litter.type + (1|Vial), data = CDR, family ="Gamma")
+```
+```{r}
+#Model List
+m.list <- list(
+"Null" = m.null,
+"m1"= m.1,
+"m2"= m.2,
+"m3"= m.3,
+"m4"= m.4,
+"m5"= m.5,
+"m6"= m.6,
+"m7"= m.7,
+"m8"= m.8,
+"m9"= m.9,
+"m10"= m.10,
+"m11"= m.11,
+"m12"= m.12,
+"m13"= m.13,
+"m14"= m.14,
+"m15"= m.15,
+"m16"= m.16,
+"m17"= m.17,
+"m18"= m.18,
+"m19"= m.19,
+"m20"= m.20,
+"m21"= m.21,
+"m22"= m.22,
+"m23"= m.23,
+"m24"= m.24,
+"m25"= m.25,
+"m26"= m.26,
+"m27"= m.27,
+"m28"= m.28,
+"m29"= m.29,
+"m30"= m.30,
+"m31"= m.31,
+"m32"= m.32,
+"m33"= m.33,
+"m34"= m.34,
+"m35"= m.35,
+"m36"= m.36,
+"m37"= m.37,
+"m38"= m.38,
+"m39"= m.39,
+"m40"= m.40,
+"m41"= m.41,
+"m42"= m.42,
+"m43"= m.43,
+"m44"= m.44,
+"m45"= m.45,
+"m46"= m.46,
+"m47"= m.47,
+"m48"= m.48,
+"m49"= m.49,
+"m50"= m.50,
+"m51"= m.51,
+"m52"= m.52,
+"m53"= m.53,
+"m54"= m.54,
+"m55"= m.55,
+"m56"= m.56,
+"m57"= m.57,
+"m58"= m.58,
+"m59"= m.59,
+"m60"= m.60,
+"m61"= m.61,
+"m62"= m.62,
+"m63"= m.63,
+"G.m.null" = G.m.null,
+"G.m1" = G.m.1,
+"G.m2" = G.m.2,
+"G.m3" = G.m.3,
+"G.m4" = G.m.4,
+"G.m5" = G.m.5,
+"G.m6" = G.m.6,
+"G.m7" = G.m.7,
+"G.m8" = G.m.8,
+"G.m9" = G.m.9,
+"G.m10" = G.m.10,
+"G.m11" = G.m.11,
+"G.m12" = G.m.12,
+"G.m13" = G.m.13,
+"G.m14" = G.m.14,
+"G.m15" = G.m.15,
+"G.m16" = G.m.16,
+"G.m17" = G.m.17,
+"G.m18" = G.m.18,
+"G.m19" = G.m.19,
+"G.m20" = G.m.20,
+"G.m21" = G.m.21,
+"G.m22" = G.m.22,
+"G.m23" = G.m.23,
+"G.m24" = G.m.24,
+"G.m25" = G.m.25,
+"G.m26" = G.m.26,
+"G.m27" = G.m.27,
+"G.m28" = G.m.28,
+"G.m29" = G.m.29,
+"G.m30" = G.m.30,
+"G.m31" = G.m.31,
+"G.m32" = G.m.32,
+"G.m33" = G.m.33,
+"G.m34" = G.m.34,
+"G.m35" = G.m.35,
+"G.m36" = G.m.36,
+"G.m37" = G.m.37,
+"G.m38" = G.m.38,
+"G.m39" = G.m.39,
+"G.m40" = G.m.40,
+"G.m41" = G.m.41,
+"G.m42" = G.m.42,
+"G.m43" = G.m.43,
+"G.m44" = G.m.44,
+"G.m45" = G.m.45,
+"G.m46" = G.m.46,
+"G.m47" = G.m.47,
+"G.m48" = G.m.48,
+"G.m49" = G.m.49,
+"G.m50" = G.m.50,
+"G.m51" = G.m.51,
+"G.m52" = G.m.52,
+"G.m53" = G.m.53,
+"G.m54" = G.m.54,
+"G.m55" = G.m.55,
+"G.m56" = G.m.56,
+"G.m57" = G.m.57,
+"G.m58" = G.m.58,
+"G.m59" = G.m.59,
+"G.m60" = G.m.60,
+"G.m61" = G.m.61,
+"G.m62" = G.m.62,
+"G.m63" = G.m.63
+)
+```
+```{r}
+aictab(m.list)
+```
+```{r}
+summary(m.11) # Best Model
+```
+```{r}
+summary(m.12) #Full model
+```
+
+```{r}
+summary(m.23) #Best with Site*Fertilizer treatment interaction
+```
+
+```{r}
+qplot(x = Site, y = CO2.mg, data = CDR, color = Litter.type) + geom_smooth(method = "lm")
+```
+
+```{r}
+m.draft <- ggplot(CDR, aes(Site, CO2.mg, color = Fertilizer.Treatment))+ geom_point(size = 2)+ facet_wrap(~Litter.type)
+```
+```{r}
+m.draft + scale_color_viridis(discrete = TRUE, option = "viridis") + theme_bw()
+```
+
+```{r}
+ggplot(CDR, aes(x=Site, y=CO2.mg, fill = Litter.type)) + geom_bar(stat = "identity", position = "dodge", width = 0.5) + theme_bw() + scale_fill_viridis(discrete = T)
+```
+
+```{r}
+ggplot(CDR, aes(x=Site, y=CO2.mg, fill = Fertilizer.Treatment)) + geom_bar(stat = "identity", position = "dodge", width = 0.5) + theme_bw() + scale_fill_viridis(discrete = T) + coord_polar(start = 0) +ylim (-100,120) + facet_wrap(~Litter.type)
+```
+
+
+
+```{r}
+ggplot(CDR, aes(x=Site, y = CO2.mg, fill = Litter.type))+ geom_boxplot(outlier.colour = "black", outlier.shape = 16, outlier.size = 2, notch = FALSE)
+```
+
+```{r}
+
+```
+
